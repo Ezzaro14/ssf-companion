@@ -24,3 +24,7 @@ htmlcov/
 .idea/
 *.swp
 .DS_Store
+
+# Misc
+*.log
+pythontests/

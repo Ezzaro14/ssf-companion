@@ -163,3 +163,16 @@ def test_crlf_input_parses_identically():
 def test_divider_with_trailing_whitespace():
     text = "Rarity: Normal\nIron Ring\n--------   \nItem Level: 1"  # divider with trailing spaces
     assert len(split_sections(text)) == 2
+
+def parse_item(text: str) -> ParsedItem:
+    sections = split_sections(text)
+    if not sections:
+        raise ValueError("empty item text")  # fail loudly rather than guess
+
+    item = parse_header(sections[0])   # header is always first section
+    item.item_level = parse_item_level(sections)
+    item.quality = parse_quality(sections)
+    item.sockets = parse_sockets(sections)
+    item.flags = parse_flags(sections)
+    item.mods = extract_mods(sections)
+    return item  # one call in, one fully populated object out

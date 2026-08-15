@@ -1,6 +1,7 @@
 from pathlib import Path
 from items.parser import normalise_mod_text
 from items.parser import split_sections
+from items.parser import parse_item
 import pytest
 
 FIXTURES = Path(__file__).parent / "fixtures" / "items"  # folder of real copied items
@@ -78,3 +79,8 @@ def test_white_base_has_no_mods():
 
 def test_unidentified_item_has_no_mods():
     assert extract_mods(split_sections(load("unid_rare.txt"))) == []
+
+@pytest.mark.parametrize("filename", [p.name for p in FIXTURES.glob("*.txt")])
+def test_parse_item_succeeds_on_every_fixture(filename):
+    item = parse_item(load(filename))
+    assert item.base_type

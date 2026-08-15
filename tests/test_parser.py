@@ -68,3 +68,13 @@ def test_mod_normalisation(text, expected_template, expected_values):
     template, values = normalise_mod_text(text)
     assert template == expected_template
     assert values == expected_values
+
+from items.parser import extract_mods
+
+
+def test_white_base_has_no_mods():
+    assert extract_mods(split_sections(load("white_base.txt"))) == []
+
+
+def test_unidentified_item_has_no_mods():
+    assert extract_mods(split_sections(load("unid_rare.txt"))) == []

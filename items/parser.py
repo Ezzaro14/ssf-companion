@@ -127,6 +127,13 @@ def parse_mod_section(section: list[str]) -> list[ParsedMod]:
 
     return mods
 
+
+def extract_mods(sections: list[list[str]]) -> list[ParsedMod]:
+    for section in sections:  # find the section that looks like mods, by content not position
+        if any(MOD_HEADER.match(line) for line in section):
+            return parse_mod_section(section)
+    return []  # no section matched - item has no explicit mods (white base, unidentified)
+
 def normalise_mod_text(text: str) -> tuple[str, list[float]]:
     values = [float(m.group()) for m in NUMBER.finditer(text)]
 

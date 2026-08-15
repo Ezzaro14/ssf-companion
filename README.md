@@ -18,12 +18,23 @@ A crafting planner for Path of Exile SSF.
 
 ## Status
 
-Early development (WIP)
+**Early development (WIP)**
+- Repo Bootstap - Django, DRF, Postgres, CI, py tests, env configs
+- Copied Item Text Parser - structures and reads copied item data  
+
+**Plans**
+- Crafting Probability 
+- Possible Crafting Route Advice
+- Required Item Tracker
+- Item Acquisition Guide
+- Currency Drop Data from your sessions(Zone Tracking)
+- PoB Import?
+
 
 ## Local setup
 
 ```bash
-git clone https://github.com/Eszaro14/ssf-companion.git
+git clone https://github.com/Ezzaro14/ssf-companion.git
 cd ssf-companion
 
 python -m venv .venv

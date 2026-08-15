@@ -11,6 +11,8 @@ MOD_HEADER = re.compile(  # matches: { Prefix Modifier "Flaring" (Tier: 3) }
 
 NUMBER = re.compile(r"[+-]?\d+(?:\.\d+)?")  # ints and decimals, optional sign
 
+FLAGS = {"Corrupted", "Mirrored", "Unidentified", "Split", "Fractured Item"}
+
 def split_sections(text: str) -> list[list[str]]:
     """Split raw item text into sections, each a list of non-empty lines."""
     sections: list[list[str]] = []  # finished sections accumulate here
@@ -143,3 +145,11 @@ def normalise_mod_text(text: str) -> tuple[str, list[float]]:
 
     template = NUMBER.sub(replace, text)
     return template, values
+
+def parse_flags(sections: list[list[str]]) -> set[str]:
+    return {
+        line
+        for section in sections   # flags can appear in any section
+        for line in section
+        if line in FLAGS          # bare line matching a known flag name
+    }

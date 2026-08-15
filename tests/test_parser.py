@@ -1,8 +1,15 @@
 from pathlib import Path
-from items.parser import normalise_mod_text
-from items.parser import split_sections
-from items.parser import parse_item
+
 import pytest
+
+from items.parser import (
+    extract_mods,
+    normalise_mod_text,
+    parse_header,
+    parse_item,
+    parse_sockets,
+    split_sections,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures" / "items"  # folder of real copied items
 
@@ -22,8 +29,6 @@ def test_first_section_holds_the_header():
     sections = split_sections(load("rare_armour.txt"))
     assert any(line.startswith("Rarity:") for line in sections[0])
 
-from items.parser import parse_header
-
 
 def test_rare_item_has_name_and_base():
     header = parse_header(split_sections(load("rare_armour.txt"))[0])
@@ -38,8 +43,6 @@ def test_magic_item_has_base_only():
     assert header.rarity == "Magic"
     assert header.name == ""    # magics never get a separate rolled name
     assert "Flask" in header.base_type
-
-from items.parser import parse_sockets
 
 
 def test_six_socket_item_totals_six():
@@ -69,8 +72,6 @@ def test_mod_normalisation(text, expected_template, expected_values):
     template, values = normalise_mod_text(text)
     assert template == expected_template
     assert values == expected_values
-
-from items.parser import extract_mods
 
 
 def test_white_base_has_no_mods():

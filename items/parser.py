@@ -29,6 +29,9 @@ class ParsedItem:
     item_class: str = ""
     name: str = ""       # rolled name, e.g. "Widowhail" - empty for magic/normal
     base_type: str = ""  # e.g. "Thicket Bow" - always present
+    item_level: int | None = None
+    quality: int = 0
+    sockets: list[SocketGroup] = field(default_factory=list)
 
 def find_labelled_value(sections: list[list[str]], label: str) -> str | None:
     prefix = f"{label}:"
@@ -46,11 +49,9 @@ def parse_item_level(sections: list[list[str]]) -> int | None:
 def parse_quality(sections: list[list[str]]) -> int:
     value = find_labelled_value(sections, "Quality")
     if not value:
-        return 0  # no Quality line - treat as 0%, not unknown
+        return 0  # no Quality line - treat as 0%
     digits = "".join(c for c in value.split("%")[0] if c.isdigit())  # "+20% (augmented)" -> "20"
     return int(digits) if digits else 0
-
-
 
 def parse_header(section: list[str]) -> ParsedItem:
     item = ParsedItem()
@@ -70,3 +71,21 @@ def parse_header(section: list[str]) -> ParsedItem:
         item.base_type = name_lines[0]  # magic/normal - affixes baked into wording
 
     return item
+
+@dataclass
+class SocketGroup:
+    colours: list[str]  # e.g. ["B", "G", "R"] for one linked group
+
+    @property
+    def size(self) -> int:
+        return len(self.colours)
+
+
+def parse_sockets(sections: list[list[str]]) -> list[SocketGroup]:
+    value = find_labelled_value(sections, "Sockets")
+    if not value:
+        return []  # no Sockets line (flasks, jewels)
+    return [
+        SocketGroup(colours=group.split("-"))  # spaces split groups, dashes split sockets
+        for group in value.split()
+    ]

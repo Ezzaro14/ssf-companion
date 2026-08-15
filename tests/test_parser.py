@@ -1,11 +1,9 @@
 from pathlib import Path
-
+from items.parser import normalise_mod_text
+from items.parser import split_sections
 import pytest
 
-from items.parser import split_sections
-
 FIXTURES = Path(__file__).parent / "fixtures" / "items"  # folder of real copied items
-
 
 def load(name: str) -> str:
     return (FIXTURES / name).read_text(encoding="utf-8")  # read fixture file as saved
@@ -55,3 +53,18 @@ def test_item_without_sockets_returns_empty():
 def test_link_groups_are_separated_by_spaces():
     sockets = parse_sockets(split_sections(load("rare_armour.txt")))
     assert all(group.size >= 1 for group in sockets)  # no empty groups
+
+@pytest.mark.parametrize(
+    "text,expected_template,expected_values",
+    [
+        ("+42 to maximum Life", "+# to maximum Life", [42.0]),
+        ("Adds 12 to 24 Physical Damage", "Adds # to # Physical Damage", [12.0, 24.0]),  # ranged mod
+        ("40% increased Movement Speed", "#% increased Movement Speed", [40.0]),
+        ("Regenerate 1.2 Life per second", "Regenerate # Life per second", [1.2]),  # decimal
+        ("Cannot be Frozen", "Cannot be Frozen", []),  # no numbers - must survive untouched
+    ],
+)
+def test_mod_normalisation(text, expected_template, expected_values):
+    template, values = normalise_mod_text(text)
+    assert template == expected_template
+    assert values == expected_values

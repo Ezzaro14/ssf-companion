@@ -1,0 +1,34 @@
+Item Class: Body Armours
+Rarity: Rare
+Spirit Shell
+General's Brigandine
+--------
+Quality: +20% (augmented)
+Armour: 1313 (augmented)
+Evasion Rating: 1303 (augmented)
+Intangibility: 10%
+--------
+Requirements:
+Level: 69
+Str: 103
+Dex: 109
+Int: 109
+--------
+Sockets: R-W-G-W-W W 
+--------
+Item Level: 83
+--------
+{ Prefix Modifier "Barbed" (Tier: 2) — Damage, Physical }
+Reflects 24(11-24) Physical Damage to Melee Attackers
+{ Prefix Modifier "Adaptable" (Tier: 2) — Defences, Armour, Evasion }
++235(221-300) to Armour
++230(221-300) to Evasion Rating
+{ Master Crafted Prefix Modifier "Upgraded" (Rank: 3) — Defences, Armour, Evasion }
+67(56-74)% increased Armour and Evasion
+{ Suffix Modifier "of the Maelstrom" (Tier: 3) — Elemental, Lightning, Resistance }
++39(36-41)% to Lightning Resistance
+{ Suffix Modifier "of the Volcano" (Tier: 3) — Elemental, Fire, Resistance }
++36(36-41)% to Fire Resistance
+{ Suffix Modifier "of Abjuration" (Tier: 2) }
++19(17-19)% chance to Suppress Spell Damage
+(40% of Damage from Suppressed Hits and Ailments they inflict is prevented)

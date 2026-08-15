@@ -1,0 +1,21 @@
+Item Class: Life Flasks
+Rarity: Magic
+Dolomite Divine Life Flask of the Cure
+--------
+Quality: +20% (augmented)
+Recovers 3658 (augmented) Life over 3.50 Seconds
+Consumes 18 (augmented) of 45 Charges on use
+Currently has 0 Charges
+--------
+Requirements:
+Level: 60
+--------
+Item Level: 69
+--------
+{ Prefix Modifier "Dolomite" (Tier: 4) }
+21(20-25)% increased Charges per use
+27(27-32)% increased Amount Recovered
+{ Suffix Modifier "of the Cure" (Tier: 2) }
+Grants Immunity to Poison for 12(12-14) seconds if used while Poisoned
+--------
+Right click to drink. Can only hold charges while in belt. Refills as you kill monsters.

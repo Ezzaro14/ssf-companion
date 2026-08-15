@@ -1,0 +1,26 @@
+Item Class: Utility Flasks
+Rarity: Magic
+Abecedarian's Basalt Flask of Bloodshed
+--------
+Lasts 5.30 (augmented) Seconds
+Consumes 40 of 60 Charges on use
+Currently has 0 Charges
+20% more Armour
+--------
+Requirements:
+Level: 27
+--------
+Item Level: 77
+--------
+{ Implicit Modifier }
+Taunts nearby Enemies on use
+(Enemies you Taunt can only target you, and deal 10% less damage to anyone else. Taunt lasts for 3 seconds)
+--------
+{ Prefix Modifier "Abecedarian's" (Tier: 3) }
+34(38-33)% reduced Duration
+25% increased effect
+{ Suffix Modifier "of Bloodshed" (Tier: 5) — Life, Attack }
+0.4% of Attack Damage Leeched as Life during Effect
+(Leeched Life is recovered over time. Multiple Leeches can occur simultaneously, up to a maximum rate)
+--------
+Right click to drink. Can only hold charges while in belt. Refills as you kill monsters.

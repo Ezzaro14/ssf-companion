@@ -1,0 +1,26 @@
+Item Class: Amulets
+Rarity: Rare
+Loath Rosary
+Turquoise Amulet
+--------
+Requirements:
+Level: 64
+--------
+Item Level: 78
+--------
+Allocates Decay Ward (enchant)
+--------
+{ Implicit Modifier — Attribute }
++17(16-24) to Dexterity and Intelligence
+--------
+{ Prefix Modifier "Mazarine" (Tier: 4) — Mana }
++63(60-64) to maximum Mana
+{ Prefix Modifier "Buttressed" (Tier: 4) — Defences, Armour }
+21(19-23)% increased Armour
+{ Prefix Modifier "Rotund" (Tier: 3) — Life }
++92(85-99) to maximum Life
+{ Suffix Modifier "of the Heavens" (Tier: 5) — Attribute }
++20(17-20) to all Attributes
+(Attributes are Strength, Dexterity, and Intelligence)
+{ Master Crafted Suffix Modifier "of Craft" — Elemental, Lightning, Chaos, Resistance }
++13(13-15)% to Lightning and Chaos Resistances

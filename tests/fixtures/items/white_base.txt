@@ -1,0 +1,15 @@
+Item Class: Boots
+Rarity: Normal
+Serpentscale Boots
+--------
+Armour: 77
+Evasion Rating: 77
+--------
+Requirements:
+Level: 42
+Str: 40
+Dex: 40
+--------
+Sockets: W 
+--------
+Item Level: 61

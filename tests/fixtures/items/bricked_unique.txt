@@ -1,0 +1,32 @@
+Item Class: Rings
+Rarity: Unique
+Malachai's Artifice
+Unset Ring
+--------
+Requirements:
+Level: 5
+--------
+Item Level: 80
+--------
+{ Corruption Implicit Modifier — Mana }
+23(20-25)% increased Mana Cost Efficiency
+--------
+{ Unique Modifier — Damage, Elemental, Gem }
+Socketed Gems have Elemental Equilibrium — Unscalable Value
+(Hits that deal Elemental Damage remove Exposure to those Elements and inflict Exposure to other Elements, applying -25% to Resistances)
+{ Unique Modifier — Elemental, Fire, Resistance, Gem }
++92(75-100)% to Fire Resistance when Socketed with a Red Gem
+{ Unique Modifier — Elemental, Lightning, Resistance, Gem }
++93(75-100)% to Lightning Resistance when Socketed with a Blue Gem
+{ Unique Modifier — Elemental, Cold, Resistance, Gem }
++91(75-100)% to Cold Resistance when Socketed with a Green Gem
+{ Unique Modifier }
+All Sockets are White — Unscalable Value
+{ Unique Modifier — Elemental, Resistance }
+-20% to all Elemental Resistances
+--------
+When the wind blows, 
+Know which way to bend
+and watch the others break.
+--------
+Corrupted

@@ -20,6 +20,24 @@ A crafting planner for Path of Exile SSF.
 
 Early development (WIP)
 
+## Local setup
+
+```bash
+git clone https://github.com/Eszaro14/ssf-companion.git
+cd ssf-companion
+
+python -m venv .venv
+source .venv/bin/activate        # Windows: .\.venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+
+cp .env.example .env             # then set SECRET_KEY
+docker compose up -d             # starts postgres
+
+python manage.py migrate
+python manage.py runserver
+pytest
+```
+
 ---
 
 *Not affiliated with or endorsed by Grinding Gear Games*

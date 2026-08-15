@@ -43,6 +43,14 @@ def parse_item_level(sections: list[list[str]]) -> int | None:
     value = find_labelled_value(sections, "Item Level")
     return int(value) if value else None  # None means not present, not zero
 
+def parse_quality(sections: list[list[str]]) -> int:
+    value = find_labelled_value(sections, "Quality")
+    if not value:
+        return 0  # no Quality line - treat as 0%, not unknown
+    digits = "".join(c for c in value.split("%")[0] if c.isdigit())  # "+20% (augmented)" -> "20"
+    return int(digits) if digits else 0
+
+
 
 def parse_header(section: list[str]) -> ParsedItem:
     item = ParsedItem()

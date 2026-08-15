@@ -13,6 +13,7 @@ NUMBER = re.compile(r"[+-]?\d+(?:\.\d+)?")  # ints and decimals, optional sign
 
 FLAGS = {"Corrupted", "Mirrored", "Unidentified", "Split", "Fractured Item"}
 
+
 def split_sections(text: str) -> list[list[str]]:
     """Split raw item text into sections, each a list of non-empty lines."""
     sections: list[list[str]] = []  # finished sections accumulate here
@@ -32,6 +33,7 @@ def split_sections(text: str) -> list[list[str]]:
 
     return sections
 
+
 @dataclass
 class SocketGroup:
     colours: list[str]  # e.g. ["B", "G", "R"] for one linked group
@@ -45,15 +47,16 @@ class SocketGroup:
 class ParsedItem:
     rarity: str = ""
     item_class: str = ""
-    name: str = ""       # rolled name, e.g. "Widowhail" - empty for magic/normal
+    name: str = ""  # rolled name, e.g. "Widowhail" - empty for magic/normal
     base_type: str = ""  # e.g. "Thicket Bow" - always present
     item_level: int | None = None
     quality: int = 0
     sockets: list[SocketGroup] = field(default_factory=list)
 
+
 def find_labelled_value(sections: list[list[str]], label: str) -> str | None:
     prefix = f"{label}:"
-    for section in sections:      # item level can live in any section
+    for section in sections:  # item level can live in any section
         for line in section:
             if line.startswith(prefix):
                 return line.split(":", 1)[1].strip()
@@ -64,12 +67,14 @@ def parse_item_level(sections: list[list[str]]) -> int | None:
     value = find_labelled_value(sections, "Item Level")
     return int(value) if value else None
 
+
 def parse_quality(sections: list[list[str]]) -> int:
     value = find_labelled_value(sections, "Quality")
     if not value:
         return 0  # no Quality line - treat as 0%
     digits = "".join(c for c in value.split("%")[0] if c.isdigit())  # "+20% (augmented)" -> "20"
     return int(digits) if digits else 0
+
 
 def parse_header(section: list[str]) -> ParsedItem:
     item = ParsedItem()
@@ -90,6 +95,7 @@ def parse_header(section: list[str]) -> ParsedItem:
 
     return item
 
+
 def parse_sockets(sections: list[list[str]]) -> list[SocketGroup]:
     value = find_labelled_value(sections, "Sockets")
     if not value:
@@ -99,12 +105,13 @@ def parse_sockets(sections: list[list[str]]) -> list[SocketGroup]:
         for group in value.split()
     ]
 
+
 @dataclass
 class ParsedMod:
     text: str
-    kind: str = "explicit"      # implicit / prefix / suffix / enchant / crafted
-    affix_name: str = ""        # e.g. "Flaring" - empty if unknown
-    tier: int | None = None     # e.g. 3 - None if unknown
+    kind: str = "explicit"  # implicit / prefix / suffix / enchant / crafted
+    affix_name: str = ""  # e.g. "Flaring" - empty if unknown
+    tier: int | None = None  # e.g. 3 - None if unknown
 
 
 def parse_mod_section(section: list[str]) -> list[ParsedMod]:
@@ -117,12 +124,14 @@ def parse_mod_section(section: list[str]) -> list[ParsedMod]:
             pending = match.groupdict()  # header line
             continue
         if pending:
-            mods.append(ParsedMod(  # mod text
-                text=line,
-                kind=pending["kind"].lower(),
-                affix_name=pending["name"] or "",
-                tier=int(pending["tier"]) if pending["tier"] else None,
-            ))
+            mods.append(
+                ParsedMod(  # mod text
+                    text=line,
+                    kind=pending["kind"].lower(),
+                    affix_name=pending["name"] or "",
+                    tier=int(pending["tier"]) if pending["tier"] else None,
+                )
+            )
             pending = None  # consumed, reset for next mod
         else:
             mods.append(ParsedMod(text=line))  # no header matched
@@ -136,6 +145,7 @@ def extract_mods(sections: list[list[str]]) -> list[ParsedMod]:
             return parse_mod_section(section)
     return []  # no section matched - item has no explicit mods (white base, unidentified)
 
+
 def normalise_mod_text(text: str) -> tuple[str, list[float]]:
     values = [float(m.group()) for m in NUMBER.finditer(text)]
 
@@ -146,20 +156,22 @@ def normalise_mod_text(text: str) -> tuple[str, list[float]]:
     template = NUMBER.sub(replace, text)
     return template, values
 
+
 def parse_flags(sections: list[list[str]]) -> set[str]:
     return {
         line
-        for section in sections   # flags can appear in any section
+        for section in sections  # flags can appear in any section
         for line in section
-        if line in FLAGS          # bare line matching a known flag name
+        if line in FLAGS  # bare line matching a known flag name
     }
+
 
 def parse_item(text: str) -> ParsedItem:
     sections = split_sections(text)
     if not sections:
         raise ValueError("empty item text")  # fail loudly rather than guess
 
-    item = parse_header(sections[0])   # header is always first section
+    item = parse_header(sections[0])  # header is always first section
     item.item_level = parse_item_level(sections)
     item.quality = parse_quality(sections)
     item.sockets = parse_sockets(sections)

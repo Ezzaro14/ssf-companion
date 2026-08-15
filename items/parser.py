@@ -30,6 +30,19 @@ class ParsedItem:
     name: str = ""       # rolled name, e.g. "Widowhail" - empty for magic/normal
     base_type: str = ""  # e.g. "Thicket Bow" - always present
 
+def find_labelled_value(sections: list[list[str]], label: str) -> str | None:
+    prefix = f"{label}:"
+    for section in sections:      # item level can live in any section
+        for line in section:
+            if line.startswith(prefix):
+                return line.split(":", 1)[1].strip()
+    return None  # label not found
+
+
+def parse_item_level(sections: list[list[str]]) -> int | None:
+    value = find_labelled_value(sections, "Item Level")
+    return int(value) if value else None  # None means not present, not zero
+
 
 def parse_header(section: list[str]) -> ParsedItem:
     item = ParsedItem()

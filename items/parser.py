@@ -9,6 +9,8 @@ MOD_HEADER = re.compile(  # matches: { Prefix Modifier "Flaring" (Tier: 3) }
     r"(?:\s+\(Tier:\s*(?P<tier>\d+)\))?"
 )
 
+NUMBER = re.compile(r"[+-]?\d+(?:\.\d+)?")  # ints and decimals, optional sign
+
 def split_sections(text: str) -> list[list[str]]:
     """Split raw item text into sections, each a list of non-empty lines."""
     sections: list[list[str]] = []  # finished sections accumulate here
@@ -124,3 +126,13 @@ def parse_mod_section(section: list[str]) -> list[ParsedMod]:
             mods.append(ParsedMod(text=line))  # no header matched
 
     return mods
+
+def normalise_mod_text(text: str) -> tuple[str, list[float]]:
+    values = [float(m.group()) for m in NUMBER.finditer(text)]
+
+    def replace(m: re.Match) -> str:
+        sign = m.group()[0] if m.group()[0] in "+-" else ""
+        return f"{sign}#"
+
+    template = NUMBER.sub(replace, text)
+    return template, values

@@ -1,7 +1,7 @@
 ![CI](https://github.com/Ezzaro14/ssf-companion/actions/workflows/ci.yml/badge.svg)
 # SSF Companion
 
-A crafting planner for Path of Exile SSF.
+A crafting planner for Path of Exile SSF
 
 ## Features
 

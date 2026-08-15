@@ -1,7 +1,13 @@
+import re
 from dataclasses import dataclass, field
 
 DIVIDER = "--------"  # PoE uses 8-dash line to separate item text sections
 
+MOD_HEADER = re.compile(  # matches: { Prefix Modifier "Flaring" (Tier: 3) }
+    r"^\{\s*(?P<kind>\w+)\s+Modifier"
+    r'(?:\s+"(?P<name>[^"]+)")?'
+    r"(?:\s+\(Tier:\s*(?P<tier>\d+)\))?"
+)
 
 def split_sections(text: str) -> list[list[str]]:
     """Split raw item text into sections, each a list of non-empty lines."""
@@ -88,3 +94,33 @@ def parse_sockets(sections: list[list[str]]) -> list[SocketGroup]:
         SocketGroup(colours=group.split("-"))  # spaces split groups, dashes split sockets
         for group in value.split()
     ]
+
+@dataclass
+class ParsedMod:
+    text: str
+    kind: str = "explicit"      # implicit / prefix / suffix / enchant / crafted
+    affix_name: str = ""        # e.g. "Flaring" - empty if unknown
+    tier: int | None = None     # e.g. 3 - None if unknown
+
+
+def parse_mod_section(section: list[str]) -> list[ParsedMod]:
+    mods: list[ParsedMod] = []
+    pending: dict | None = None
+
+    for line in section:
+        match = MOD_HEADER.match(line)
+        if match:
+            pending = match.groupdict()  # header line
+            continue
+        if pending:
+            mods.append(ParsedMod(  # mod text
+                text=line,
+                kind=pending["kind"].lower(),
+                affix_name=pending["name"] or "",
+                tier=int(pending["tier"]) if pending["tier"] else None,
+            ))
+            pending = None  # consumed, reset for next mod
+        else:
+            mods.append(ParsedMod(text=line))  # no header matched
+
+    return mods

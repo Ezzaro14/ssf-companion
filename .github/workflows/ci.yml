@@ -17,3 +17,18 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: ruff check .
       - run: ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-not-a-real-secret
+      DEBUG: "True"
+      DATABASE_URL: sqlite:///db.sqlite3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: pytest

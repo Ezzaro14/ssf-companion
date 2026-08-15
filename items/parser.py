@@ -153,3 +153,13 @@ def parse_flags(sections: list[list[str]]) -> set[str]:
         for line in section
         if line in FLAGS          # bare line matching a known flag name
     }
+
+def test_crlf_input_parses_identically():
+    text = load("rare_armour.txt")
+    crlf = text.replace("\n", "\r\n")  # simulate a Windows-style copy
+    assert split_sections(text) == split_sections(crlf)  # line ending must not change result
+
+
+def test_divider_with_trailing_whitespace():
+    text = "Rarity: Normal\nIron Ring\n--------   \nItem Level: 1"  # divider with trailing spaces
+    assert len(split_sections(text)) == 2

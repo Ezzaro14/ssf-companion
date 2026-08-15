@@ -22,6 +22,14 @@ def split_sections(text: str) -> list[list[str]]:
 
     return sections
 
+@dataclass
+class SocketGroup:
+    colours: list[str]  # e.g. ["B", "G", "R"] for one linked group
+
+    @property
+    def size(self) -> int:
+        return len(self.colours)
+
 
 @dataclass
 class ParsedItem:
@@ -44,7 +52,7 @@ def find_labelled_value(sections: list[list[str]], label: str) -> str | None:
 
 def parse_item_level(sections: list[list[str]]) -> int | None:
     value = find_labelled_value(sections, "Item Level")
-    return int(value) if value else None  # None means not present, not zero
+    return int(value) if value else None
 
 def parse_quality(sections: list[list[str]]) -> int:
     value = find_labelled_value(sections, "Quality")
@@ -71,15 +79,6 @@ def parse_header(section: list[str]) -> ParsedItem:
         item.base_type = name_lines[0]  # magic/normal - affixes baked into wording
 
     return item
-
-@dataclass
-class SocketGroup:
-    colours: list[str]  # e.g. ["B", "G", "R"] for one linked group
-
-    @property
-    def size(self) -> int:
-        return len(self.colours)
-
 
 def parse_sockets(sections: list[list[str]]) -> list[SocketGroup]:
     value = find_labelled_value(sections, "Sockets")

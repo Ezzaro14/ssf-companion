@@ -13,3 +13,8 @@ ignore = ["E501"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["config", "items", "crafting"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+testpaths = ["tests"]

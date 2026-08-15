@@ -1,0 +1,28 @@
+Item Class: Rings
+Rarity: Rare
+Hate Whorl
+Iron Ring
+--------
+Requirements:
+Level: 47
+--------
+Item Level: 78
+--------
+{ Implicit Modifier — Damage, Physical, Attack }
+Adds 1 to 4 Physical Damage to Attacks
+--------
+{ Prefix Modifier "Opalescent" (Tier: 7) — Mana }
++49(45-49) to maximum Mana
+{ Prefix Modifier "Scintillating" (Tier: 3) — Defences, Energy Shield }
++32(32-37) to maximum Energy Shield
+{ Prefix Modifier "Magpie's" (Tier: 4) — Drop }
+10(8-12)% increased Rarity of Items found
+{ Suffix Modifier "of Shining" (Tier: 3) — Attack }
+11(9-11)% increased Global Accuracy Rating
+5% increased Light Radius
+{ Suffix Modifier "of the Gorilla" (Tier: 5) — Attribute }
++31(28-32) to Strength
+{ Suffix Modifier "of the Troll" (Tier: 2) — Life }
+Regenerate 37.8(32.1-48) Life per second
+--------
+Corrupted

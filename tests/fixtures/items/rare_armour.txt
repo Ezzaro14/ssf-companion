@@ -1,0 +1,24 @@
+Item Class: Body Armours
+Rarity: Rare
+Rage Wrap
+Spidersilk Robe
+--------
+Quality: +20% (augmented)
+Energy Shield: 206 (augmented)
+--------
+Requirements:
+Level: 49
+Int: 134
+--------
+Sockets: B-W-W-W-W W 
+--------
+Item Level: 53
+--------
+{ Prefix Modifier "Blazing" (Tier: 4) — Defences, Energy Shield }
++61(50-61) to maximum Energy Shield
+{ Suffix Modifier "of the Penguin" (Tier: 6) — Elemental, Cold, Resistance }
++22(18-23)% to Cold Resistance
+{ Suffix Modifier "of the Furnace" (Tier: 4) — Elemental, Fire, Resistance }
++32(30-35)% to Fire Resistance
+{ Suffix Modifier "of Steel Skin" (Tier: 3) }
+21(20-22)% increased Stun and Block Recovery

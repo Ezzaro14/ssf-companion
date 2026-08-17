@@ -28,3 +28,5 @@ htmlcov/
 # Misc
 *.log
 pythontests/
+start.txt
+data/

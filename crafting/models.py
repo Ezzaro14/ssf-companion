@@ -1,13 +1,12 @@
 from django.db import models
 
-
 # Create your models here.
 class DataVersion(models.Model):
     """One import run. Every BaseItemType and Mod belongs to exactly one."""
 
     league = models.CharField(max_length=100)      # "Settlers", "Standard"
-    patch = models.CharField(max_length=50)        # "3.25.0"
-    source = models.CharField(max_length=500)      # URL the dump came from
+    patch = models.CharField(max_length=50)        # "3.29.3.1.4 currently"
+    source = models.CharField(max_length=500)      # URL of dump
     imported_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=False)  # which version queries default to
 
@@ -56,7 +55,7 @@ class Mod(models.Model):
 
     data_version = models.ForeignKey(DataVersion, on_delete=models.CASCADE, related_name="mods")
     internal_id = models.CharField(max_length=200)           # "FlaskIncreasedMovementSpeed3"
-    name = models.CharField(max_length=200)                  # "of Adrenaline" - what AMD shows
+    name = models.CharField(max_length=200)                  # "of Adrenaline"
     generation_type = models.CharField(max_length=50)        # raw source value
     domain = models.CharField(max_length=50)
     required_level = models.PositiveIntegerField(default=1)  # ilvl
@@ -78,11 +77,11 @@ class SpawnWeight(models.Model):
     mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="spawn_weights")
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT, related_name="spawn_weights")
     weight = models.PositiveIntegerField()
-    order = models.PositiveSmallIntegerField()  # position in the source list
+    order = models.PositiveSmallIntegerField()  # position in source list
 
     class Meta:
-        ordering = ["order"]                       # never rely on insertion order
-        unique_together = [("mod", "order")]       # one entry per position
+        ordering = ["order"]
+        unique_together = [("mod", "order")]
         indexes = [models.Index(fields=["tag"])]
 
     def __str__(self):
@@ -93,7 +92,7 @@ class GenerationWeight(models.Model):
 
     mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="generation_weights")
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT, related_name="generation_weights")
-    value = models.PositiveIntegerField()       # weight multiplier
+    value = models.PositiveIntegerField()       # weight multi
     order = models.PositiveSmallIntegerField()
 
     class Meta:

@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class DataVersion(models.Model):
     """One import run. Every BaseItemType and Mod belongs to exactly one."""

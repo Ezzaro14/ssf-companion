@@ -5,32 +5,52 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('crafting', '0001_initial'),
+        ("crafting", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Tag',
+            name="Tag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='BaseItemType',
+            name="BaseItemType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('item_class', models.CharField(max_length=100)),
-                ('domain', models.CharField(max_length=50)),
-                ('data_version', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='base_items', to='crafting.dataversion')),
-                ('tags', models.ManyToManyField(related_name='base_item_types', to='crafting.tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("item_class", models.CharField(max_length=100)),
+                ("domain", models.CharField(max_length=50)),
+                (
+                    "data_version",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="base_items",
+                        to="crafting.dataversion",
+                    ),
+                ),
+                ("tags", models.ManyToManyField(related_name="base_item_types", to="crafting.tag")),
             ],
             options={
-                'indexes': [models.Index(fields=['data_version', 'domain'], name='crafting_ba_data_ve_1d5418_idx')],
-                'unique_together': {('data_version', 'name')},
+                "indexes": [
+                    models.Index(
+                        fields=["data_version", "domain"], name="crafting_ba_data_ve_1d5418_idx"
+                    )
+                ],
+                "unique_together": {("data_version", "name")},
             },
         ),
     ]

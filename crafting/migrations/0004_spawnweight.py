@@ -5,25 +5,43 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('crafting', '0003_modgroup_mod'),
+        ("crafting", "0003_modgroup_mod"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SpawnWeight',
+            name="SpawnWeight",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('weight', models.PositiveIntegerField()),
-                ('order', models.PositiveSmallIntegerField()),
-                ('mod', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='spawn_weights', to='crafting.mod')),
-                ('tag', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='spawn_weights', to='crafting.tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("weight", models.PositiveIntegerField()),
+                ("order", models.PositiveSmallIntegerField()),
+                (
+                    "mod",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="spawn_weights",
+                        to="crafting.mod",
+                    ),
+                ),
+                (
+                    "tag",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="spawn_weights",
+                        to="crafting.tag",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order'],
-                'indexes': [models.Index(fields=['tag'], name='crafting_sp_tag_id_33874b_idx')],
-                'unique_together': {('mod', 'order')},
+                "ordering": ["order"],
+                "indexes": [models.Index(fields=["tag"], name="crafting_sp_tag_id_33874b_idx")],
+                "unique_together": {("mod", "order")},
             },
         ),
     ]

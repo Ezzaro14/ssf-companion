@@ -46,7 +46,6 @@ class Command(BaseCommand):
         n = self.import_base_items(base_items, version)
         self.stdout.write(self.style.SUCCESS(f"imported {n} base items"))
 
-
     def import_base_items(self, data: dict, version: DataVersion) -> int:
         count = 0
         for metadata_id, entry in data.items():
@@ -67,4 +66,3 @@ class Command(BaseCommand):
                 base.tags.add(tag)
             count += 1
         return count
-

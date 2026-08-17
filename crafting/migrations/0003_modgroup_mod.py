@@ -5,35 +5,80 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('crafting', '0002_tag_baseitemtype'),
+        ("crafting", "0002_tag_baseitemtype"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ModGroup',
+            name="ModGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(max_length=200, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Mod',
+            name="Mod",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('internal_id', models.CharField(max_length=200)),
-                ('name', models.CharField(max_length=200)),
-                ('generation_type', models.CharField(choices=[('prefix', 'Prefix'), ('suffix', 'Suffix'), ('corrupted', 'Corrupted'), ('enchantment', 'Enchantment'), ('unique', 'Unique')], max_length=30)),
-                ('domain', models.CharField(max_length=50)),
-                ('required_level', models.PositiveIntegerField(default=1)),
-                ('adds_tags', models.ManyToManyField(blank=True, related_name='added_by_mods', to='crafting.tag')),
-                ('data_version', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='mods', to='crafting.dataversion')),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='mods', to='crafting.modgroup')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("internal_id", models.CharField(max_length=200)),
+                ("name", models.CharField(max_length=200)),
+                (
+                    "generation_type",
+                    models.CharField(
+                        choices=[
+                            ("prefix", "Prefix"),
+                            ("suffix", "Suffix"),
+                            ("corrupted", "Corrupted"),
+                            ("enchantment", "Enchantment"),
+                            ("unique", "Unique"),
+                        ],
+                        max_length=30,
+                    ),
+                ),
+                ("domain", models.CharField(max_length=50)),
+                ("required_level", models.PositiveIntegerField(default=1)),
+                (
+                    "adds_tags",
+                    models.ManyToManyField(
+                        blank=True, related_name="added_by_mods", to="crafting.tag"
+                    ),
+                ),
+                (
+                    "data_version",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="mods",
+                        to="crafting.dataversion",
+                    ),
+                ),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="mods",
+                        to="crafting.modgroup",
+                    ),
+                ),
             ],
             options={
-                'indexes': [models.Index(fields=['data_version', 'domain', 'generation_type'], name='crafting_mo_data_ve_e5d185_idx')],
-                'unique_together': {('data_version', 'internal_id')},
+                "indexes": [
+                    models.Index(
+                        fields=["data_version", "domain", "generation_type"],
+                        name="crafting_mo_data_ve_e5d185_idx",
+                    )
+                ],
+                "unique_together": {("data_version", "internal_id")},
             },
         ),
     ]

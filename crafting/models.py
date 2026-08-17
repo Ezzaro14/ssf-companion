@@ -74,3 +74,20 @@ class Mod(models.Model):
 
     def __str__(self):
         return f"{self.internal_id} ({self.name})"
+
+class SpawnWeight(models.Model):
+    """One (tag, weight) pair. Ordering matters - first matching tag wins, weight 0 blocks."""
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="spawn_weights")
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT, related_name="spawn_weights")
+    weight = models.PositiveIntegerField()
+    order = models.PositiveSmallIntegerField()  # position in the source list
+
+    class Meta:
+        ordering = ["order"]                       # never rely on insertion order
+        unique_together = [("mod", "order")]       # one entry per position
+        indexes = [models.Index(fields=["tag"])]
+
+    def __str__(self):
+        return f"{self.tag.name}={self.weight}"
+

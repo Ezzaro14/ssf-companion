@@ -3,7 +3,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
-from crafting.models import DataVersion
+from crafting.models import BaseItemType, DataVersion, Tag
 
 
 class Command(BaseCommand):
@@ -43,3 +43,28 @@ class Command(BaseCommand):
         )
         verb = "created" if created else "reusing"
         self.stdout.write(f"{verb} data version {version}")
+        n = self.import_base_items(base_items, version)
+        self.stdout.write(self.style.SUCCESS(f"imported {n} base items"))
+
+
+    def import_base_items(self, data: dict, version: DataVersion) -> int:
+        count = 0
+        for metadata_id, entry in data.items():
+            if entry.get("release_state") != "released":
+                continue
+            if not entry.get("name"):
+                continue  # ~400 nameless internal entries
+
+            base = BaseItemType.objects.create(
+                data_version=version,
+                metadata_id=metadata_id,
+                name=entry["name"],
+                item_class=entry["item_class"],
+                domain=entry["domain"],
+            )
+            for tag_name in entry.get("implicit_tags", []):
+                tag, _ = Tag.objects.get_or_create(name=tag_name)
+                base.tags.add(tag)
+            count += 1
+        return count
+

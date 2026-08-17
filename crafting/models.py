@@ -16,3 +16,25 @@ class DataVersion(models.Model):
     def __str__(self):
         return f"{self.league} {self.patch}"
 
+class Tag(models.Model):
+    """Game data tag - "flask", "utility_flask", "weapon". Mod eligibility is decided by tags."""
+
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class BaseItemType(models.Model):
+    data_version = models.ForeignKey(DataVersion, on_delete=models.CASCADE, related_name="base_items")
+    name = models.CharField(max_length=200)         # "Basalt Flask"
+    item_class = models.CharField(max_length=100)   # "UtilityFlask"
+    domain = models.CharField(max_length=50)        # only same-domain mods can roll here
+    tags = models.ManyToManyField(Tag, related_name="base_item_types")
+
+    class Meta:
+        unique_together = [("data_version", "name")]
+        indexes = [models.Index(fields=["data_version", "domain"])]
+
+    def __str__(self):
+        return self.name

@@ -27,13 +27,14 @@ class Tag(models.Model):
 
 class BaseItemType(models.Model):
     data_version = models.ForeignKey(DataVersion, on_delete=models.CASCADE, related_name="base_items")
-    name = models.CharField(max_length=200)         # "Basalt Flask"
-    item_class = models.CharField(max_length=100)   # "UtilityFlask"
-    domain = models.CharField(max_length=50)        # only same-domain mods can roll here
-    tags = models.ManyToManyField(Tag, related_name="base_item_types")
+    metadata_id = models.CharField(max_length=300)  
+    name = models.CharField(max_length=200, db_index=True)  # display name
+    item_class = models.CharField(max_length=100)   # "Body Armour"
+    domain = models.CharField(max_length=50)        # only same-domain mods can roll
+    tags = models.ManyToManyField(Tag, related_name="base_item_types")  # spawn weight tags
 
     class Meta:
-        unique_together = [("data_version", "name")]
+        unique_together = [("data_version", "metadata_id")]
         indexes = [models.Index(fields=["data_version", "domain"])]
 
     def __str__(self):
@@ -51,21 +52,16 @@ class ModGroup(models.Model):
 class Mod(models.Model):
     PREFIX = "prefix"
     SUFFIX = "suffix"
-    GENERATION_TYPES = [
-        (PREFIX, "Prefix"),
-        (SUFFIX, "Suffix"),
-        ("corrupted", "Corrupted"),
-        ("enchantment", "Enchantment"),
-        ("unique", "Unique"),
-    ]
 
     data_version = models.ForeignKey(DataVersion, on_delete=models.CASCADE, related_name="mods")
-    internal_id = models.CharField(max_length=200)   # "FlaskIncreasedMovementSpeed3"
-    name = models.CharField(max_length=200)          # "of Adrenaline" - what AMD shows
-    generation_type = models.CharField(max_length=30, choices=GENERATION_TYPES)
-    group = models.ForeignKey(ModGroup, on_delete=models.PROTECT, related_name="mods")
+    internal_id = models.CharField(max_length=200)           # "FlaskIncreasedMovementSpeed3"
+    name = models.CharField(max_length=200)                  # "of Adrenaline" - what AMD shows
+    generation_type = models.CharField(max_length=50)        # raw source value
     domain = models.CharField(max_length=50)
-    required_level = models.PositiveIntegerField(default=1)  # ilvl gate
+    required_level = models.PositiveIntegerField(default=1)  # ilvl
+
+    groups = models.ManyToManyField(ModGroup, related_name="mods")
+    tags = models.ManyToManyField(Tag, related_name="tagged_mods", blank=True)
     adds_tags = models.ManyToManyField(Tag, related_name="added_by_mods", blank=True)
 
     class Meta:
@@ -91,3 +87,17 @@ class SpawnWeight(models.Model):
     def __str__(self):
         return f"{self.tag.name}={self.weight}"
 
+class GenerationWeight(models.Model):
+    """Ordered (tag, multiplier) pairs applied on top of spawn weights. Drives fossils."""
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="generation_weights")
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT, related_name="generation_weights")
+    value = models.PositiveIntegerField()       # weight multiplier
+    order = models.PositiveSmallIntegerField()
+
+    class Meta:
+        ordering = ["order"]
+        unique_together = [("mod", "order")]
+
+    def __str__(self):
+        return f"{self.tag.name}x{self.value}"

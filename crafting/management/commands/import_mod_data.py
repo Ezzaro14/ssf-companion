@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 
 from crafting.models import BaseItemType, DataVersion, Tag
 
@@ -23,6 +24,7 @@ class Command(BaseCommand):
         with path.open(encoding="utf-8") as f:
             return json.load(f)
 
+    @transaction.atomic
     def handle(self, *args, **options):
         source = Path(options["source"])
         if not source.is_dir():
@@ -61,7 +63,7 @@ class Command(BaseCommand):
                 item_class=entry["item_class"],
                 domain=entry["domain"],
             )
-            for tag_name in entry.get("implicit_tags", []):
+            for tag_name in entry.get("tags", []):
                 tag, _ = Tag.objects.get_or_create(name=tag_name)
                 base.tags.add(tag)
             count += 1

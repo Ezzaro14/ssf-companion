@@ -5,7 +5,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from crafting.models import BaseItemType, DataVersion, Mod, ModGroup, Tag
+from crafting.models import BaseItemType, DataVersion, Mod, ModGroup, SpawnWeight, Tag
 
 
 class Command(BaseCommand):
@@ -102,5 +102,13 @@ class Command(BaseCommand):
                 mod.tags.add(tag)
 
             count += 1
+            for position, sw in enumerate(entry.get("spawn_weights", [])):
+                tag, _ = Tag.objects.get_or_create(name=sw["tag"])
+                SpawnWeight.objects.create(
+                    mod=mod,
+                    tag=tag,
+                    weight=sw["weight"],
+                    order=position,
+                )
 
         return count

@@ -1,10 +1,11 @@
 import json
+from collections import Counter
 from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from crafting.models import BaseItemType, DataVersion, Tag
+from crafting.models import BaseItemType, DataVersion, Mod, ModGroup, Tag
 
 
 class Command(BaseCommand):
@@ -47,6 +48,8 @@ class Command(BaseCommand):
         self.stdout.write(f"{verb} data version {version}")
         n = self.import_base_items(base_items, version)
         self.stdout.write(self.style.SUCCESS(f"imported {n} base items"))
+        m = self.import_mods(mods, version)
+        self.stdout.write(self.style.SUCCESS(f"imported {m} mods"))
 
     def import_base_items(self, data: dict, version: DataVersion) -> int:
         count = 0
@@ -67,4 +70,37 @@ class Command(BaseCommand):
                 tag, _ = Tag.objects.get_or_create(name=tag_name)
                 base.tags.add(tag)
             count += 1
+        return count
+
+    def import_mods(self, data: dict, version: DataVersion) -> int:
+        seen = Counter(v["generation_type"] for v in data.values())
+        self.stdout.write(f"generation types: {dict(seen.most_common())}")
+        count = 0
+
+        for internal_id, entry in data.items():
+            mod = Mod.objects.create(
+                data_version=version,
+                internal_id=internal_id,
+                name=entry.get("name", ""),
+                generation_type=entry["generation_type"],
+                domain=entry["domain"],
+                required_level=entry.get("required_level", 1),
+            )
+
+            # "groups" list or "group"
+            group_names = entry.get("groups") or ([entry["group"]] if entry.get("group") else [])
+            if not group_names:
+                group_names = [internal_id]  # no group means "blocks only itself"
+            for group_name in group_names:
+                group, _ = ModGroup.objects.get_or_create(name=group_name)
+                mod.groups.add(group)
+
+            for tag_name in entry.get(
+                "implicit_tags", []
+            ):  # mod tags - attribute, attack, caster...
+                tag, _ = Tag.objects.get_or_create(name=tag_name)
+                mod.tags.add(tag)
+
+            count += 1
+
         return count

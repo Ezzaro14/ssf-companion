@@ -1,0 +1,264 @@
+{
+  "LifeLeechPermyriadSuffix1": {
+    "adds_tags": [
+      "has_attack_mod"
+    ],
+    "domain": "item",
+    "generation_type": "suffix",
+    "generation_weights": [
+      {
+        "tag": "attack_dagger",
+        "weight": 100
+      },
+      {
+        "tag": "dagger",
+        "weight": 50
+      },
+      {
+        "tag": "warstaff",
+        "weight": 100
+      },
+      {
+        "tag": "staff",
+        "weight": 50
+      },
+      {
+        "tag": "sceptre",
+        "weight": 50
+      },
+      {
+        "tag": "wand_can_roll_caster_modifiers",
+        "weight": 50
+      },
+      {
+        "tag": "default",
+        "weight": 100
+      }
+    ],
+    "grants_effects": [],
+    "groups": [
+      "LifeLeech"
+    ],
+    "implicit_tags": [
+      "resource",
+      "life",
+      "physical",
+      "attack"
+    ],
+    "is_essence_only": false,
+    "name": "of the Remora",
+    "required_level": 50,
+    "spawn_weights": [
+      {
+        "tag": "ring",
+        "weight": 1000
+      },
+      {
+        "tag": "amulet",
+        "weight": 1000
+      },
+      {
+        "tag": "gloves",
+        "weight": 1000
+      },
+      {
+        "tag": "quiver",
+        "weight": 1000
+      },
+      {
+        "tag": "default",
+        "weight": 0
+      }
+    ],
+    "stats": [
+      {
+        "id": "life_leech_from_physical_attack_damage_permyriad",
+        "max": 40,
+        "min": 20
+      }
+    ],
+    "text": "(0.2-0.4)% of Physical Attack Damage Leeched as Life",
+    "type": "LifeLeechPermyriad",
+    "gold_value": null
+  },
+  "FlaskIncreasedRecoveryOnLowLife1": {
+    "adds_tags": [],
+    "domain": "flask",
+    "generation_type": "prefix",
+    "generation_weights": [],
+    "grants_effects": [],
+    "groups": [
+      "FlaskRecoveryAmount"
+    ],
+    "implicit_tags": [
+      "flask"
+    ],
+    "is_essence_only": false,
+    "name": "Prudent",
+    "required_level": 6,
+    "spawn_weights": [
+      {
+        "tag": "utility_flask",
+        "weight": 0
+      },
+      {
+        "tag": "mana_flask",
+        "weight": 0
+      },
+      {
+        "tag": "default",
+        "weight": 600
+      }
+    ],
+    "stats": [
+      {
+        "id": "local_flask_amount_to_recover_+%_when_on_low_life",
+        "max": 106,
+        "min": 101
+      }
+    ],
+    "text": "(101-106)% more Recovery if used while on Low Life",
+    "type": "FlaskIncreasedRecoveryOnLowLife",
+    "gold_value": null
+  },
+  "FlaskDispellsChill1": {
+    "adds_tags": [],
+    "domain": "flask",
+    "generation_type": "suffix",
+    "generation_weights": [],
+    "grants_effects": [],
+    "groups": [
+      "FlaskDispellChill"
+    ],
+    "implicit_tags": [
+      "flask",
+      "elemental",
+      "cold",
+      "ailment"
+    ],
+    "is_essence_only": false,
+    "name": "of Heat",
+    "required_level": 4,
+    "spawn_weights": [
+      {
+        "tag": "default",
+        "weight": 0
+      }
+    ],
+    "stats": [
+      {
+        "id": "local_flask_chill_or_freeze_immunity_if_chilled_or_frozen",
+        "max": 1,
+        "min": 1
+      }
+    ],
+    "text": "Grants Immunity to Chill for 4 seconds if used while Chilled\nGrants Immunity to Freeze for 4 seconds if used while Frozen",
+    "type": "FlaskDispellsChill",
+    "gold_value": null
+  },
+  "IncreasedLife3": {
+    "adds_tags": [],
+    "domain": "item",
+    "generation_type": "prefix",
+    "generation_weights": [],
+    "grants_effects": [],
+    "groups": [
+      "IncreasedLife"
+    ],
+    "implicit_tags": [
+      "resource",
+      "life"
+    ],
+    "is_essence_only": false,
+    "name": "Stalwart",
+    "required_level": 18,
+    "spawn_weights": [
+      {
+        "tag": "fishing_rod",
+        "weight": 0
+      },
+      {
+        "tag": "weapon",
+        "weight": 0
+      },
+      {
+        "tag": "default",
+        "weight": 1000
+      }
+    ],
+    "stats": [
+      {
+        "id": "base_maximum_life",
+        "max": 54,
+        "min": 40
+      }
+    ],
+    "text": "+(40-54) to maximum Life",
+    "type": "IncreasedLife",
+    "gold_value": null
+  },
+  "IncreasedLife4": {
+    "adds_tags": [],
+    "domain": "item",
+    "generation_type": "prefix",
+    "generation_weights": [],
+    "grants_effects": [],
+    "groups": [
+      "IncreasedLife"
+    ],
+    "implicit_tags": [
+      "resource",
+      "life"
+    ],
+    "is_essence_only": false,
+    "name": "Stout",
+    "required_level": 24,
+    "spawn_weights": [
+      {
+        "tag": "fishing_rod",
+        "weight": 0
+      },
+      {
+        "tag": "weapon",
+        "weight": 0
+      },
+      {
+        "tag": "default",
+        "weight": 1000
+      }
+    ],
+    "stats": [
+      {
+        "id": "base_maximum_life",
+        "max": 69,
+        "min": 55
+      }
+    ],
+    "text": "+(55-69) to maximum Life",
+    "type": "IncreasedLife",
+    "gold_value": null
+  },
+  "MapMtxRowBoatEnabled": {
+    "adds_tags": [],
+    "domain": "area",
+    "generation_type": "unique",
+    "generation_weights": [],
+    "grants_effects": [],
+    "groups": [],
+    "implicit_tags": [],
+    "is_essence_only": false,
+    "name": "",
+    "required_level": 1,
+    "spawn_weights": [],
+    "stats": [
+      {
+        "id": "map_row_boats_enabled",
+        "max": 1,
+        "min": 1
+      }
+    ],
+    "text": null,
+    "type": "MapRowBoatEnabled",
+    "gold_value": null
+  }
+}

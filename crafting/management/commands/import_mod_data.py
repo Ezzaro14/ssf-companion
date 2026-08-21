@@ -55,15 +55,32 @@ class Command(BaseCommand):
 
         return names
 
-    def build_tag_cache(self, base_items: dict, mods: dict) -> dict[str, Tag]:
-        # Create every tag up front, then return a name -> Tag lookup
-        # Avoids a get_or_create round trip per tag per row; with ~40k mods
+    def tag_cache(self, names: set[str]) -> dict[str, Tag]:
+        existing = {t.name: t for t in Tag.objects.filter(name__in=names)}
+        missing = names - existing.keys()
+        if missing:
+            Tag.objects.bulk_create([Tag(name=n) for n in missing], batch_size=1000)
+            existing.update({t.name: t for t in Tag.objects.filter(name__in=missing)})
+        return existing
 
-        names = self.collect_tag_names(base_items, mods)
-        Tag.objects.bulk_create([Tag(name=n) for n in names], ignore_conflicts=True)
-        return {t.name: t for t in Tag.objects.all()}
+    def group_cache(self, names: set[str]) -> dict[str, int]:
+        # Same pattern as tag_cache, but only ids
+        existing = dict(ModGroup.objects.filter(name__in=names).values_list("name", "id"))
+        missing = names - existing.keys()
+        if missing:
+            ModGroup.objects.bulk_create([ModGroup(name=n) for n in missing], batch_size=1000)
+            existing.update(
+                dict(ModGroup.objects.filter(name__in=missing).values_list("name", "id"))
+            )
+        return existing
 
-    # ------------------------------------------------------------------
+    def bulk_link(self, through, source_field: str, target_field: str, pairs) -> None:
+        through.objects.bulk_create(
+            [through(**{source_field: s, target_field: t}) for s, t in pairs],
+            batch_size=5000,
+            ignore_conflicts=True,
+        )
+
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -79,129 +96,175 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("dry run - nothing written"))
             return
 
+        version = self.resolve_data_version(options)
+
+        self.tags = self.tag_cache(self.collect_tag_names(base_items, mods))
+        self.stdout.write(f"cached {len(self.tags)} tags")
+
+        n = self.import_base_items(base_items, version)
+        self.stdout.write(self.style.SUCCESS(f"imported {n} base items"))
+ 
+        m = self.import_mods(mods, version)
+        self.stdout.write(self.style.SUCCESS(f"imported {m} mods"))
+ 
+        a = self.import_added_tags(mods, version)
+        self.stdout.write(self.style.SUCCESS(f"linked added tags on {a} mods"))
+
+    def resolve_data_version(self, options) -> DataVersion:
         version, created = DataVersion.objects.get_or_create(
             league=options["league"],
             patch=options["patch"],
             defaults={"source": options["url"]},
         )
-
         if created:
             self.stdout.write(f"created data version {version}")
-        else:
-            if not options["force"]:
-                raise CommandError(
-                    f"{version} already imported - pass --force to wipe and reimport"
-                )
-            self.stdout.write(self.style.WARNING(f"clearing existing rows for {version}"))
-            # SpawnWeight, GenerationWeight and the m2m rows cascade with their parents
-            Mod.objects.filter(data_version=version).delete()
-            BaseItemType.objects.filter(data_version=version).delete()
+            return version
 
-        self.tags = self.build_tag_cache(base_items, mods)
-        self.stdout.write(f"cached {len(self.tags)} tags")
+        if not options["force"]:
+            raise CommandError(f"{version} already imported - pass --force to wipe and reimport")
 
-        n = self.import_base_items(base_items, version)
-        self.stdout.write(self.style.SUCCESS(f"imported {n} base items"))
-
-        m = self.import_mods(mods, version)
-        self.stdout.write(self.style.SUCCESS(f"imported {m} mods"))
-
-        a = self.import_added_tags(mods, version)
-        self.stdout.write(self.style.SUCCESS(f"linked added tags on {a} mods"))
+        self.stdout.write(self.style.WARNING(f"clearing existing rows for {version}"))
+        # SpawnWeight, GenerationWeight and m2m rows cascade with parents.
+        Mod.objects.filter(data_version=version).delete()
+        BaseItemType.objects.filter(data_version=version).delete()
+        return version
 
     def import_base_items(self, data: dict, version: DataVersion) -> int:
         # Import released, named base items
-        count = 0
-        for metadata_id, entry in data.items():
-            if entry.get("release_state") != "released":
-                continue
-            if not entry.get("name"):
-                continue
+        wanted = {
+            metadata_id: entry
+            for metadata_id, entry in data.items()
+            if entry.get("release_state") == "released" and entry.get("name")
+        }
 
-            base = BaseItemType.objects.create(
-                data_version=version,
-                metadata_id=metadata_id,
-                name=entry["name"],
-                item_class=entry["item_class"],
-                domain=entry["domain"],
-            )
-            tags = [self.tags[name] for name in entry.get("tags") or []]
-            if tags:
-                base.tags.add(*tags)
-            count += 1
-        return count
+        BaseItemType.objects.bulk_create(
+            [
+                BaseItemType(
+                    data_version=version,
+                    metadata_id=metadata_id,
+                    name=entry["name"],
+                    item_class=entry["item_class"],
+                    domain=entry["domain"],
+                )
+                for metadata_id, entry in wanted.items()
+            ],
+            batch_size=2000,
+        )
+
+        base_ids = dict(
+            BaseItemType.objects.filter(data_version=version).values_list("metadata_id", "id")
+        )
+ 
+        self.bulk_link(
+            BaseItemType.tags.through,
+            "baseitemtype_id",
+            "tag_id",
+            [
+                (base_ids[metadata_id], self.tags[tag_name].id)
+                for metadata_id, entry in wanted.items()
+                for tag_name in entry.get("tags") or []
+            ],
+        )
+ 
+        return len(wanted)
+    @staticmethod
+    def group_names(internal_id: str, entry: dict) -> list[str]:
+        names = entry.get("groups") or ([entry["group"]] if entry.get("group") else [])
+        return names or [internal_id]
 
     def import_mods(self, data: dict, version: DataVersion) -> int:
         seen = Counter(v["generation_type"] for v in data.values())
         self.stdout.write(f"generation types: {dict(seen.most_common())}")
-        count = 0
-
-        for internal_id, entry in data.items():
-            mod = Mod.objects.create(
-                data_version=version,
-                internal_id=internal_id,
-                name=entry.get("name", ""),
-                generation_type=entry["generation_type"],
-                domain=entry["domain"],
-                required_level=entry.get("required_level", 1),
-            )
-
-            # "groups" list or single "group"; no group means it blocks only itself
-            group_names = entry.get("groups") or ([entry["group"]] if entry.get("group") else [])
-            if not group_names:
-                group_names = [internal_id]
-            for group_name in group_names:
-                group, _ = ModGroup.objects.get_or_create(name=group_name)
-                mod.groups.add(group)
-
-            # mod's own tags - attribute, attack, caster, and so on
-            mod_tags = [self.tags[name] for name in entry.get("implicit_tags") or []]
-            if mod_tags:
-                mod.tags.add(*mod_tags)
-
-            SpawnWeight.objects.bulk_create(
-                [
-                    SpawnWeight(
-                        mod=mod,
-                        tag=self.tags[sw["tag"]],
-                        weight=sw["weight"],
-                        order=position,
-                    )
-                    for position, sw in enumerate(entry.get("spawn_weights") or [])
-                ]
-            )
-
-            GenerationWeight.objects.bulk_create(
-                [
-                    GenerationWeight(
-                        mod=mod,
-                        tag=self.tags[gw["tag"]],
-                        value=gw["weight"],
-                        order=position,
-                    )
-                    for position, gw in enumerate(entry.get("generation_weights") or [])
-                ]
-            )
-
-            count += 1
-
-        return count
+ 
+        # mod rows 
+        Mod.objects.bulk_create(
+            [
+                Mod(
+                    data_version=version,
+                    internal_id=internal_id,
+                    name=entry.get("name", ""),
+                    generation_type=entry["generation_type"],
+                    domain=entry["domain"],
+                    required_level=entry.get("required_level", 1),
+                )
+                for internal_id, entry in data.items()
+            ],
+            batch_size=2000,
+        )
+ 
+        mod_ids = dict(Mod.objects.filter(data_version=version).values_list("internal_id", "id"))
+ 
+        # groups - collect every name then link
+        groups_by_mod = {
+            internal_id: self.group_names(internal_id, entry)
+            for internal_id, entry in data.items()
+        }
+        all_group_names = {name for names in groups_by_mod.values() for name in names}
+        group_ids = self.group_cache(all_group_names)
+ 
+        self.bulk_link(
+            Mod.groups.through,
+            "mod_id",
+            "modgroup_id",
+            [
+                (mod_ids[internal_id], group_ids[name])
+                for internal_id, names in groups_by_mod.items()
+                for name in names
+            ],
+        )
+ 
+        # the mod tags
+        self.bulk_link(
+            Mod.tags.through,
+            "mod_id",
+            "tag_id",
+            [
+                (mod_ids[internal_id], self.tags[name].id)
+                for internal_id, entry in data.items()
+                for name in entry.get("implicit_tags") or []
+            ],
+        )
+ 
+        # spawn weights - first matching tag wins
+        SpawnWeight.objects.bulk_create(
+            [
+                SpawnWeight(
+                    mod_id=mod_ids[internal_id],
+                    tag=self.tags[sw["tag"]],
+                    weight=sw["weight"],
+                    order=position,
+                )
+                for internal_id, entry in data.items()
+                for position, sw in enumerate(entry.get("spawn_weights") or [])
+            ],
+            batch_size=5000,
+        )
+ 
+        # generation weights e.g. fossil
+        GenerationWeight.objects.bulk_create(
+            [
+                GenerationWeight(
+                    mod_id=mod_ids[internal_id],
+                    tag=self.tags[gw["tag"]],
+                    value=gw["weight"],
+                    order=position,
+                )
+                for internal_id, entry in data.items()
+                for position, gw in enumerate(entry.get("generation_weights") or [])
+            ],
+            batch_size=5000,
+        )
+ 
+        return len(data)
 
     def import_added_tags(self, data: dict, version: DataVersion) -> int:
-        """Link mods to the tags they add to an item.
-
-        Must run after import_mods: a mod can add a tag that other mods in the
-        same dump depend on, so every Mod row has to exist first.
-        """
-        mods_by_id = {m.internal_id: m for m in Mod.objects.filter(data_version=version)}
-        count = 0
-
-        for internal_id, entry in data.items():
-            added = entry.get("adds_tags") or []
-            if not added:
-                continue
-            mod = mods_by_id[internal_id]
-            mod.adds_tags.add(*[self.tags[name] for name in added])
-            count += 1
-
-        return count
+        mod_ids = dict(Mod.objects.filter(data_version=version).values_list("internal_id", "id"))
+        pairs = [
+            (mod_ids[internal_id], self.tags[name].id)
+            for internal_id, entry in data.items()
+            for name in entry.get("adds_tags") or []
+        ]
+ 
+        self.bulk_link(Mod.adds_tags.through, "mod_id", "tag_id", pairs)
+ 
+        return len({mod_id for mod_id, _ in pairs})

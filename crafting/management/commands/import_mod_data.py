@@ -81,7 +81,6 @@ class Command(BaseCommand):
             ignore_conflicts=True,
         )
 
-
     @transaction.atomic
     def handle(self, *args, **options):
         source = Path(options["source"])
@@ -103,10 +102,10 @@ class Command(BaseCommand):
 
         n = self.import_base_items(base_items, version)
         self.stdout.write(self.style.SUCCESS(f"imported {n} base items"))
- 
+
         m = self.import_mods(mods, version)
         self.stdout.write(self.style.SUCCESS(f"imported {m} mods"))
- 
+
         a = self.import_added_tags(mods, version)
         self.stdout.write(self.style.SUCCESS(f"linked added tags on {a} mods"))
 
@@ -154,7 +153,7 @@ class Command(BaseCommand):
         base_ids = dict(
             BaseItemType.objects.filter(data_version=version).values_list("metadata_id", "id")
         )
- 
+
         self.bulk_link(
             BaseItemType.tags.through,
             "baseitemtype_id",
@@ -165,8 +164,9 @@ class Command(BaseCommand):
                 for tag_name in entry.get("tags") or []
             ],
         )
- 
+
         return len(wanted)
+
     @staticmethod
     def group_names(internal_id: str, entry: dict) -> list[str]:
         names = entry.get("groups") or ([entry["group"]] if entry.get("group") else [])
@@ -175,8 +175,8 @@ class Command(BaseCommand):
     def import_mods(self, data: dict, version: DataVersion) -> int:
         seen = Counter(v["generation_type"] for v in data.values())
         self.stdout.write(f"generation types: {dict(seen.most_common())}")
- 
-        # mod rows 
+
+        # mod rows
         Mod.objects.bulk_create(
             [
                 Mod(
@@ -191,17 +191,16 @@ class Command(BaseCommand):
             ],
             batch_size=2000,
         )
- 
+
         mod_ids = dict(Mod.objects.filter(data_version=version).values_list("internal_id", "id"))
- 
+
         # groups - collect every name then link
         groups_by_mod = {
-            internal_id: self.group_names(internal_id, entry)
-            for internal_id, entry in data.items()
+            internal_id: self.group_names(internal_id, entry) for internal_id, entry in data.items()
         }
         all_group_names = {name for names in groups_by_mod.values() for name in names}
         group_ids = self.group_cache(all_group_names)
- 
+
         self.bulk_link(
             Mod.groups.through,
             "mod_id",
@@ -212,7 +211,7 @@ class Command(BaseCommand):
                 for name in names
             ],
         )
- 
+
         # the mod tags
         self.bulk_link(
             Mod.tags.through,
@@ -224,7 +223,7 @@ class Command(BaseCommand):
                 for name in entry.get("implicit_tags") or []
             ],
         )
- 
+
         # spawn weights - first matching tag wins
         SpawnWeight.objects.bulk_create(
             [
@@ -239,7 +238,7 @@ class Command(BaseCommand):
             ],
             batch_size=5000,
         )
- 
+
         # generation weights e.g. fossil
         GenerationWeight.objects.bulk_create(
             [
@@ -254,7 +253,7 @@ class Command(BaseCommand):
             ],
             batch_size=5000,
         )
- 
+
         return len(data)
 
     def import_added_tags(self, data: dict, version: DataVersion) -> int:
@@ -264,7 +263,7 @@ class Command(BaseCommand):
             for internal_id, entry in data.items()
             for name in entry.get("adds_tags") or []
         ]
- 
+
         self.bulk_link(Mod.adds_tags.through, "mod_id", "tag_id", pairs)
- 
+
         return len({mod_id for mod_id, _ in pairs})

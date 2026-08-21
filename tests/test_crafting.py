@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from django.core.management import call_command
 
-from crafting.models import BaseItemType, Mod
+from crafting.models import Mod
 
 FIXTURE = Path(__file__).parent / "fixtures" / "repoe"
 
@@ -11,7 +11,8 @@ FIXTURE = Path(__file__).parent / "fixtures" / "repoe"
 @pytest.fixture
 def imported(db):
     call_command("import_mod_data", source=str(FIXTURE), league="Test", patch="0.0.0")
-                 
+
+
 def test_suffix_mod_matches_verified_values(imported):
     mod = Mod.objects.get(internal_id="LifeLeechPermyriadSuffix1")
     assert mod.name == "of the Remora"
@@ -23,7 +24,7 @@ def test_suffix_mod_matches_verified_values(imported):
         ("amulet", 1000),
         ("gloves", 1000),
         ("quiver", 1000),
-        ("default", 0),      # allow-list: everything not listed above is blocked
+        ("default", 0),  # allow-list: everything not listed above is blocked
     ]
 
 

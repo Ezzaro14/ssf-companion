@@ -1,6 +1,11 @@
 [package]
 name = "ssf-cli"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "A development binary for the planner, usable with no UI."
 
 [dependencies]
+
+[lints]
+workspace = true

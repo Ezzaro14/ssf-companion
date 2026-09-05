@@ -1,6 +1,11 @@
 [package]
 name = "ssf-craft"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "State, pools, odds and every crafting mechanic the planner knows."
 
 [dependencies]
+
+[lints]
+workspace = true

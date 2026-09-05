@@ -1,6 +1,11 @@
 [package]
 name = "ssf-economy"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Currencies, activities, rates: what an orb costs in farm time."
 
 [dependencies]
+
+[lints]
+workspace = true

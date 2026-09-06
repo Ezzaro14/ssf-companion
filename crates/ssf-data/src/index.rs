@@ -3,7 +3,7 @@
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
-use crate::ids::{BaseId, DomainId, GroupId, Interner, ModId, TagId};
+use crate::ids::{BaseId, GroupId, Interner, ModId, TagId};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Slot {
     Prefix,
@@ -55,12 +55,11 @@ pub struct ModRecord {
     pub text: String,
 }
 // A mod record has a list of spawn weights, which are pairs of (tag, weight). The weight is used to determine the probability of the mod spawning on an item with the given tag. The first matching tag is used, and the weight is returned. If no tags match, the weight is 0.
-#[derive(Debug, Clone, Serialize, Deserialize)]
 impl ModRecord {
     pub fn weight_for(&self, tags: &TagSet) -> i32 {
         for &(tag, weight) in &self.spawn_weights {
             if tags.contains(tag) {
-                return weight;      // stop here — even when it is 0
+                return weight; // stop here — even when it is 0
             }
         }
         0

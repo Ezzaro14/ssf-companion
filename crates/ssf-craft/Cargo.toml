@@ -6,6 +6,8 @@ license.workspace = true
 description = "State, pools, odds and every crafting mechanic the planner knows."
 
 [dependencies]
+ssf-data = { workspace = true }
+rustc-hash = { workspace = true }
 
 [lints]
 workspace = true

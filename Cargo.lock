@@ -206,6 +206,10 @@ version = "0.1.0"
 [[package]]
 name = "ssf-craft"
 version = "0.1.0"
+dependencies = [
+ "rustc-hash",
+ "ssf-data",
+]
 
 [[package]]
 name = "ssf-data"

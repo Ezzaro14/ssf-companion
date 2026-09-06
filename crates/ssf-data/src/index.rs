@@ -56,6 +56,7 @@ pub struct ModRecord {
     pub required_level: u32,
     pub spawn_weights: Vec<(TagId, i32)>,
     pub text: String,
+    pub is_essence_only: bool,
 }
 // A mod record has a list of spawn weights, which are pairs of (tag, weight). The weight is used to determine the probability of the mod spawning on an item with the given tag. The first matching tag is used, and the weight is returned. If no tags match, the weight is 0.
 impl ModRecord {
@@ -92,6 +93,10 @@ impl GameData {
     #[must_use]
     pub fn modifier(&self, id: ModId) -> &ModRecord {
         &self.mods[id.index()]
+    }
+
+    pub fn modifiers(&self) -> impl Iterator<Item = &ModRecord> {
+        self.mods.iter()
     }
 
     #[must_use]

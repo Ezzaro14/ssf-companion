@@ -42,6 +42,7 @@ pub fn build(bases: BTreeMap<String, RawBase>, mods: BTreeMap<String, RawMod>) -
             required_level: raw.required_level as u32,
             spawn_weights,
             text: raw.text,
+            is_essence_only: raw.is_essence_only,
         });
     }
 
@@ -68,7 +69,6 @@ pub fn build(bases: BTreeMap<String, RawBase>, mods: BTreeMap<String, RawMod>) -
             tags: tag_set,
         });
     }
-
     GameData {
         mods: records,
         bases: base_records,

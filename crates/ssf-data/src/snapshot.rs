@@ -5,7 +5,7 @@ use std::path::Path;
 
 use crate::index::GameData;
 
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
 const MAGIC: &[u8; 8] = b"SSFIDX01";
 
 #[derive(Debug, thiserror::Error)]

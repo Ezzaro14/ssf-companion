@@ -58,3 +58,21 @@ fn item_level_gates_the_pool() {
         low.len()
     );
 }
+
+#[test]
+fn every_field_round_trips() {
+    let base = State::default();
+
+    for r in [NORMAL, MAGIC, RARE] {
+        for junk_p in 0..=3u8 {
+            for i in 0..MAX_TARGETS {
+                let s = base.with_rarity(r).with_junk_prefixes(junk_p).with_target(i);
+                assert_eq!(s.rarity(), r);
+                assert_eq!(s.junk_prefixes(), junk_p);
+                assert!(s.has_target(i));
+                // and nothing else got set
+                assert_eq!(s.flags(), 0, "writing a field leaked into flags");
+            }
+        }
+    }
+}

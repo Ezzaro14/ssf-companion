@@ -44,6 +44,41 @@ Dependencies only ever point downward in this list.
 - **Build gap analysis** — import a Path of Building code to see what you need
   to craft
 
+## Wishlist
+- **Strategy analysis** - provide the tool what you need to farm and it will 
+  suggest an optimized farming strategy.
+- **Map Data & Layout Analysis** - Suggestion for Map layouts depending on 
+  strategy. Open maps for breaches, "Linear" maps for delirium, etc.
+
+## Why I made this
+
+I'm a big fan of Path of Exile. I have thousands of hours, but I've never been
+"good" at the game. In softcore, I've only recently been able to amass 100 divs
+worth of currency. I'm a very casual gamer where it takes me a month to get my 4
+watchstones.
+
+This also means that while I love playing SSF, I struggle a lot. I'm not great at
+crafting, if I need a certain body armour, I'm not sure if I should target farm div
+cards or something else. 
+
+I'm making this as a way to get better at coding and as a nice guide for myself on
+how to proceed in the most efficient way while being VERY inefficient in the game myself
+(I do maybe 6 maps an hour?).
+
+This tool will help figure out best crafting based on what I run and how much loot of each
+currency I drop per hour and possibly help me be more efficient when I add deeper strategy
+analysis which could help me find a strategy. For example, if my build needs a cluster jewel,
+a foulborn unique armour, and a ritual corpse, it will help me make an atlas passive map that 
+has delirium, breach, and rituals. Maybe I'm also low on maps so it will allocate destructive play,
+or I will need scarabs so it will focus on scarab nodes, or both!
+
+That is my plan for this. Will it work? I highly doubt it to be honest. But I will try.
+
+Thanks for reading! I'm in the early stages of this right now but hopefully
+once it's somewhat functional, you will find it useful for yourself <3
+
+- Ezzar 06/09/2026
+
 ## Attribution
 
 Modifier and base item data from

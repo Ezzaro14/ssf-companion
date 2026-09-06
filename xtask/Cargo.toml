@@ -6,6 +6,8 @@ license.workspace = true
 publish = false
 
 [dependencies]
+ssf-data = { workspace = true }
+anyhow = { workspace = true }
 
 [lints]
 workspace = true

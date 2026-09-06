@@ -4,6 +4,7 @@ pub mod ids;
 pub mod import;
 pub mod index;
 pub mod raw;
+pub mod snapshot;
 
 pub use ids::{BaseId, ModId, TagId};
 pub use index::{BaseRecord, GameData, ModRecord, Slot, TagSet};

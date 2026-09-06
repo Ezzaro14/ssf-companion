@@ -4,6 +4,7 @@ use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::ids::{BaseId, GroupId, Interner, ModId, TagId};
+pub const CRAFTABLE_DOMAINS: [&str; 3] = ["item", "flask", "abyss_jewel"];
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Slot {
     Prefix,
@@ -12,6 +13,7 @@ pub enum Slot {
 
 impl Slot {
     // Returns the slot from a generation type string, or None if the string is not a valid generation type.
+    #[must_use]
     pub fn from_generation_type(kind: &str) -> Option<Self> {
         match kind {
             "prefix" => Some(Self::Prefix),
@@ -34,6 +36,7 @@ impl TagSet {
         }
     }
     // Returns true if the tag is in the set, false otherwise.
+    #[must_use]
     pub fn contains(&self, tag: TagId) -> bool {
         self.tags.contains(&tag)
     }
@@ -56,6 +59,7 @@ pub struct ModRecord {
 }
 // A mod record has a list of spawn weights, which are pairs of (tag, weight). The weight is used to determine the probability of the mod spawning on an item with the given tag. The first matching tag is used, and the weight is returned. If no tags match, the weight is 0.
 impl ModRecord {
+    #[must_use]
     pub fn weight_for(&self, tags: &TagSet) -> i32 {
         for &(tag, weight) in &self.spawn_weights {
             if tags.contains(tag) {
@@ -85,18 +89,22 @@ pub struct GameData {
 }
 // A GameData struct is a collection of mods, bases, tags, and groups. It is used to look up mods and bases by id or name, and to get the weight of a mod for a given set of tags.
 impl GameData {
+    #[must_use]
     pub fn modifier(&self, id: ModId) -> &ModRecord {
         &self.mods[id.index()]
     }
 
+    #[must_use]
     pub fn base(&self, id: BaseId) -> &BaseRecord {
         &self.bases[id.index()]
     }
 
+    #[must_use]
     pub fn base_by_name(&self, name: &str) -> Option<&BaseRecord> {
         self.by_name.get(name).map(|&id| self.base(id))
     }
 
+    #[must_use]
     pub fn tag_id(&self, name: &str) -> Option<TagId> {
         self.tags.get(name).map(|n| TagId(n as u16))
     }

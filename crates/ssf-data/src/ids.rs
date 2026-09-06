@@ -74,10 +74,12 @@ impl Interner {
         self.lookup.insert(s.to_owned(), id);
         id
     }
+    #[must_use]
     pub fn get(&self, s: &str) -> Option<u32> {
         self.lookup.get(s).copied()
     }
 
+    #[must_use]
     pub fn name(&self, id: u32) -> &str {
         &self.names[id as usize]
     }

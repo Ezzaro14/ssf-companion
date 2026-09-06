@@ -45,9 +45,9 @@ Dependencies only ever point downward in this list.
   to craft
 
 ## Wishlist
-- **Strategy analysis** - provide the tool what you need to farm and it will 
+- **Strategy analysis** — provide the tool what you need to farm and it will 
   suggest an optimized farming strategy.
-- **Map Data & Layout Analysis** - Suggestion for Map layouts depending on 
+- **Map Data & Layout Analysis** — Suggestion for Map layouts depending on 
   strategy. Open maps for breaches, "Linear" maps for delirium, etc.
 
 ## Why I made this

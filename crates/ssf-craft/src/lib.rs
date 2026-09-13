@@ -1,6 +1,7 @@
 //! State, pools, odds and every crafting mechanic the planner knows.
 
 pub mod constants;
+pub mod context;
 pub mod draw;
 pub mod mechanics;
 pub mod options;

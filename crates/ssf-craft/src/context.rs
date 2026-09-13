@@ -84,10 +84,11 @@ impl<'a> CraftContext<'a> {
         // A target already on the item takes its whole group out of play.
         for i in 0..self.targets.len() {
             if state.has_target(i)
-                && let Some(t) = self.targets.get(i) {
-                    let group = self.data.modifier(t.id).group;
-                    built = built.without_group(self.data, group);
-                }
+                && let Some(t) = self.targets.get(i)
+            {
+                let group = self.data.modifier(t.id).group;
+                built = built.without_group(self.data, group);
+            }
         }
 
         let built = Rc::new(built);

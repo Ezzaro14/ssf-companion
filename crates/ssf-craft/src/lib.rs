@@ -4,6 +4,7 @@ pub mod constants;
 pub mod context;
 pub mod draw;
 pub mod mechanics;
+pub mod methods;
 pub mod options;
 pub mod pool;
 pub mod state;

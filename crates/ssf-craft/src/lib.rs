@@ -2,6 +2,7 @@
 
 pub mod constants;
 pub mod draw;
+pub mod mechanics;
 pub mod options;
 pub mod pool;
 pub mod state;

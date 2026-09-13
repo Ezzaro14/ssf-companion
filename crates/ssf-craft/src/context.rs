@@ -83,12 +83,11 @@ impl<'a> CraftContext<'a> {
 
         // A target already on the item takes its whole group out of play.
         for i in 0..self.targets.len() {
-            if state.has_target(i) {
-                if let Some(t) = self.targets.get(i) {
+            if state.has_target(i)
+                && let Some(t) = self.targets.get(i) {
                     let group = self.data.modifier(t.id).group;
                     built = built.without_group(self.data, group);
                 }
-            }
         }
 
         let built = Rc::new(built);
@@ -101,7 +100,7 @@ impl<'a> CraftContext<'a> {
     /// An unavailable currency is infinity, not a large number: the solver must
     /// treat that route as impossible rather than merely expensive.
     ///
-    /// TODO: every objective costs 1.0 for now 
+    /// TODO: every objective costs 1.0 for now
     #[must_use]
     pub fn cost_of(&self, slug: &str) -> f64 {
         if self.options.is_unavailable(slug) {
@@ -124,6 +123,8 @@ impl<'a> CraftContext<'a> {
     /// Group of the modifier behind a target index.
     #[must_use]
     pub fn group_of(&self, target: usize) -> Option<GroupId> {
-        self.targets.get(target).map(|t| self.data.modifier(t.id).group)
+        self.targets
+            .get(target)
+            .map(|t| self.data.modifier(t.id).group)
     }
 }

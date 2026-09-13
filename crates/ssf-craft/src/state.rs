@@ -100,10 +100,7 @@ impl State {
 
     #[must_use]
     pub const fn with_rarity(self, r: u8) -> Self {
-        Self(
-            (self.0 & !(RARITY_MASK << RARITY_SHIFT))
-                | ((r as u64 & RARITY_MASK) << RARITY_SHIFT),
-        )
+        Self((self.0 & !(RARITY_MASK << RARITY_SHIFT)) | ((r as u64 & RARITY_MASK) << RARITY_SHIFT))
     }
 
     // -- targets on the item

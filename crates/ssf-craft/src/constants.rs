@@ -22,3 +22,12 @@ impl fmt::Display for Confidence {
         f.write_str(s)
     }
 }
+
+/// Share of a roll that lands on the prefix side.
+
+pub const PREFIX_SHARE: f64 = 0.5;
+pub const PREFIX_SHARE_CONFIDENCE: Confidence = Confidence::Reconstructed;
+
+/// How many affixes a fresh Rare rolls, and how often (based on community testing).
+pub const RARE_AFFIX_COUNTS: &[(u8, f64)] = &[(4, 0.50), (5, 0.33), (6, 0.17)];
+pub const RARE_AFFIX_CONFIDENCE: Confidence = Confidence::Reconstructed;

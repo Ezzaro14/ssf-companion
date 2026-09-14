@@ -5,7 +5,9 @@
 //! only needs the things that change which action is correct.
 //!
 //! All of it packs into a `u64`, so a state is `Copy`, hashes in one round and
-//! compares in one instruction.
+//! compares in one instruction. That is not micro-optimisation: the search
+//! interns hundreds of thousands of these and compares them tens of millions
+//! of times.
 
 use std::fmt;
 
@@ -17,6 +19,7 @@ pub const MAGIC: u8 = 1;
 pub const RARE: u8 = 2;
 
 // --- the layout ------------------------------------------------------------
+// Widths are declared; shifts are derived. Overlaps become impossible.
 
 const RARITY_BITS: u32 = 2;
 const HIT_BITS: u32 = MAX_TARGETS as u32;
@@ -51,7 +54,7 @@ const FLAGS_MASK: u64 = mask(FLAG_BITS);
 const IMPRINT_MASK: u64 = mask(IMPRINT_BITS);
 
 // --- flags -----------------------------------------------------------------
-// Persistent facts that are not modifiers in their own right.
+// Persistent facts about the item that are not modifiers in their own right.
 
 pub const MULTIMOD: u16 = 1 << 0;
 pub const LOCK_PREFIX: u16 = 1 << 1;
@@ -86,6 +89,7 @@ impl State {
         Self(bits)
     }
 
+    /// The opaque id the solver sees. It never looks inside.
     #[must_use]
     pub const fn bits(self) -> u64 {
         self.0
@@ -100,10 +104,13 @@ impl State {
 
     #[must_use]
     pub const fn with_rarity(self, r: u8) -> Self {
-        Self((self.0 & !(RARITY_MASK << RARITY_SHIFT)) | ((r as u64 & RARITY_MASK) << RARITY_SHIFT))
+        Self(
+            (self.0 & !(RARITY_MASK << RARITY_SHIFT))
+                | ((r as u64 & RARITY_MASK) << RARITY_SHIFT),
+        )
     }
 
-    // -- targets on the item
+    // -- which targets are on the item
 
     #[must_use]
     pub const fn hits(self) -> u8 {
@@ -133,10 +140,10 @@ impl State {
     }
 
     #[must_use]
-    pub const fn with_bench(self, mask_bits: u8) -> Self {
+    pub const fn with_bench(self, bits: u8) -> Self {
         Self(
             (self.0 & !(BENCH_MASK << BENCH_SHIFT))
-                | ((mask_bits as u64 & BENCH_MASK) << BENCH_SHIFT),
+                | ((bits as u64 & BENCH_MASK) << BENCH_SHIFT),
         )
     }
 
@@ -146,10 +153,10 @@ impl State {
     }
 
     #[must_use]
-    pub const fn with_fractured(self, mask_bits: u8) -> Self {
+    pub const fn with_fractured(self, bits: u8) -> Self {
         Self(
             (self.0 & !(FRACTURED_MASK << FRACTURED_SHIFT))
-                | ((mask_bits as u64 & FRACTURED_MASK) << FRACTURED_SHIFT),
+                | ((bits as u64 & FRACTURED_MASK) << FRACTURED_SHIFT),
         )
     }
 
@@ -197,7 +204,7 @@ impl State {
         Self(self.0 & !((f as u64 & FLAGS_MASK) << FLAGS_SHIFT))
     }
 
-    // -- imprint (a beast copy of a magic item)
+    // -- imprint: a beast copy of a magic item
 
     #[must_use]
     pub const fn imprint(self) -> u16 {
@@ -210,6 +217,13 @@ impl State {
             (self.0 & !(IMPRINT_MASK << IMPRINT_SHIFT))
                 | ((v as u64 & IMPRINT_MASK) << IMPRINT_SHIFT),
         )
+    }
+
+    // -- derived questions the mechanics ask constantly
+
+    #[must_use]
+    pub const fn is_corrupted(self) -> bool {
+        self.has_flag(CORRUPTED)
     }
 }
 
@@ -244,9 +258,13 @@ impl fmt::Display for State {
             }
         }
 
-        let free_p = capacity(self.rarity()).saturating_sub(self.junk_prefixes());
-        let free_s = capacity(self.rarity()).saturating_sub(self.junk_suffixes());
-        write!(f, ", {free_p}p/{free_s}s free")?;
+        let cap = capacity(self.rarity());
+        write!(
+            f,
+            ", {}p/{}s junk",
+            self.junk_prefixes().min(cap),
+            self.junk_suffixes().min(cap)
+        )?;
 
         for (bit, name) in FLAG_NAMES {
             if self.has_flag(bit) {
@@ -254,5 +272,54 @@ impl fmt::Display for State {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn every_field_round_trips() {
+        let base = State::default();
+
+        for r in [NORMAL, MAGIC, RARE] {
+            for n in 0..=3u8 {
+                for i in 0..MAX_TARGETS {
+                    let s = base
+                        .with_rarity(r)
+                        .with_junk_prefixes(n)
+                        .with_junk_suffixes(n)
+                        .with_target(i);
+
+                    assert_eq!(s.rarity(), r);
+                    assert_eq!(s.junk_prefixes(), n);
+                    assert_eq!(s.junk_suffixes(), n);
+                    assert!(s.has_target(i));
+                    assert_eq!(s.flags(), 0, "writing a field leaked into flags");
+                    assert_eq!(s.imprint(), 0, "writing a field leaked into imprint");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn flags_are_independent() {
+        let mut s = State::default();
+        for (bit, _) in FLAG_NAMES {
+            s = s.set_flag(bit);
+        }
+        for (bit, name) in FLAG_NAMES {
+            assert!(s.has_flag(bit), "{name} did not survive the others");
+        }
+        assert_eq!(s.rarity(), 0, "flags leaked into rarity");
+    }
+
+    #[test]
+    fn targets_do_not_collide_with_bench_or_fractured() {
+        let s = State::default().with_target(7).with_bench(0b1000_0000);
+        assert!(s.has_target(7));
+        assert_eq!(s.bench(), 0b1000_0000);
+        assert_eq!(s.fractured(), 0);
     }
 }

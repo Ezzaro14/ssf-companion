@@ -12,7 +12,7 @@ use crate::context::CraftContext;
 use crate::mechanics::Action;
 use crate::methods::{Method, MethodInfo};
 use crate::options::Family;
-use crate::state::{State, LOCK_PREFIX, LOCK_SUFFIX, MAGIC, NORMAL, RARE};
+use crate::state::{LOCK_PREFIX, LOCK_SUFFIX, MAGIC, NORMAL, RARE, State};
 
 // --- shared helpers ---------------------------------------------------------
 
@@ -42,7 +42,11 @@ fn reroll_outcomes(
     let mut chances = vec![0.0; n];
     for slot in [Slot::Prefix, Slot::Suffix] {
         let pool = ctx.pool_for(landed_on, slot);
-        let draws = if slot == Slot::Prefix { prefixes } else { suffixes };
+        let draws = if slot == Slot::Prefix {
+            prefixes
+        } else {
+            suffixes
+        };
         for (i, id) in ctx.wanted_in(landed_on, slot) {
             chances[i] = p_lands(pool.chance_of(id), draws);
         }
@@ -53,7 +57,11 @@ fn reroll_outcomes(
     for mask in 0u32..(1 << n) {
         let mut p = 1.0;
         for (i, &chance) in chances.iter().enumerate() {
-            p *= if mask & (1 << i) != 0 { chance } else { 1.0 - chance };
+            p *= if mask & (1 << i) != 0 {
+                chance
+            } else {
+                1.0 - chance
+            };
         }
         if p <= 0.0 {
             continue;
@@ -185,8 +193,7 @@ impl Method for Augmentation {
             return;
         }
         // A Magic item holds one per side. It needs a free one somewhere.
-        if ctx.free_affixes(state, Slot::Prefix) == 0
-            && ctx.free_affixes(state, Slot::Suffix) == 0
+        if ctx.free_affixes(state, Slot::Prefix) == 0 && ctx.free_affixes(state, Slot::Suffix) == 0
         {
             return;
         }
@@ -333,10 +340,7 @@ impl Method for Chaos {
         if state.rarity() != RARE || state.is_corrupted() {
             return;
         }
-        if state.fractured() != 0
-            || state.has_flag(LOCK_PREFIX)
-            || state.has_flag(LOCK_SUFFIX)
-        {
+        if state.fractured() != 0 || state.has_flag(LOCK_PREFIX) || state.has_flag(LOCK_SUFFIX) {
             return;
         }
 

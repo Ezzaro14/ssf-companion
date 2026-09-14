@@ -104,10 +104,7 @@ impl State {
 
     #[must_use]
     pub const fn with_rarity(self, r: u8) -> Self {
-        Self(
-            (self.0 & !(RARITY_MASK << RARITY_SHIFT))
-                | ((r as u64 & RARITY_MASK) << RARITY_SHIFT),
-        )
+        Self((self.0 & !(RARITY_MASK << RARITY_SHIFT)) | ((r as u64 & RARITY_MASK) << RARITY_SHIFT))
     }
 
     // -- which targets are on the item
@@ -141,10 +138,7 @@ impl State {
 
     #[must_use]
     pub const fn with_bench(self, bits: u8) -> Self {
-        Self(
-            (self.0 & !(BENCH_MASK << BENCH_SHIFT))
-                | ((bits as u64 & BENCH_MASK) << BENCH_SHIFT),
-        )
+        Self((self.0 & !(BENCH_MASK << BENCH_SHIFT)) | ((bits as u64 & BENCH_MASK) << BENCH_SHIFT))
     }
 
     #[must_use]

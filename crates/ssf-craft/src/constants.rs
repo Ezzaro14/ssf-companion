@@ -24,7 +24,6 @@ impl fmt::Display for Confidence {
 }
 
 /// Share of a roll that lands on the prefix side.
-
 pub const PREFIX_SHARE: f64 = 0.5;
 pub const PREFIX_SHARE_CONFIDENCE: Confidence = Confidence::Reconstructed;
 

@@ -121,6 +121,26 @@ impl<'a> CraftContext<'a> {
             .collect()
     }
 
+    /// Affixes still free on one side. An Exalted Orb needs one.
+    ///
+    /// This lives here rather than on `State` because a state does not know
+    /// which of its targets are prefixes — only the `TargetSet` does.
+    #[must_use]
+    pub fn free_affixes(&self, state: State, slot: Slot) -> u8 {
+        let junk = match slot {
+            Slot::Prefix => state.junk_prefixes(),
+            Slot::Suffix => state.junk_suffixes(),
+        };
+        let landed = self
+            .targets
+            .iter()
+            .enumerate()
+            .filter(|(i, t)| t.slot == slot && state.has_target(*i))
+            .count() as u8;
+
+        crate::state::capacity(state.rarity()).saturating_sub(junk + landed)
+    }
+
     /// Group of the modifier behind a target index.
     #[must_use]
     pub fn group_of(&self, target: usize) -> Option<GroupId> {

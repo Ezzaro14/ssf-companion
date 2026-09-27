@@ -7,6 +7,7 @@ pub mod mechanics;
 pub mod methods;
 pub mod options;
 pub mod pool;
+pub mod recipes;
 pub mod state;
 pub mod target;
 

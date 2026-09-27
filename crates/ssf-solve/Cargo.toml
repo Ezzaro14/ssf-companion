@@ -6,6 +6,7 @@ license.workspace = true
 description = "Value iteration over a cyclic state graph. Knows nothing about the game."
 
 [dependencies]
+rustc-hash = { workspace = true }
 
 [lints]
 workspace = true

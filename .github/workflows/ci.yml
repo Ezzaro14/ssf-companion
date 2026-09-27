@@ -8,4 +8,11 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: fetch the RePoE dump
+        shell: bash
+        run: |
+          mkdir -p data
+          curl -fsSL -o data/base_items.json https://raw.githubusercontent.com/lvlvllvlvllvlvl/RePoE/master/RePoE/data/base_items.json
+          curl -fsSL -o data/mods.json https://raw.githubusercontent.com/lvlvllvlvllvlvl/RePoE/master/RePoE/data/mods.json
+      - run: cargo xtask build-data
       - run: cargo test --workspace

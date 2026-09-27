@@ -47,7 +47,20 @@ So it is now a native desktop app with the solver in Rust!
 
 ## Status
 
+**Done**
 - Toolchain & Workspace Created
+- Game Data Import & Snapshot
+- Modifier Pools & Roll Odds
+- Item State Model
+- Basic Currency Crafting (Transmutation to Scouring)
+- CI Testing Against Real Game Data
+
+**In Progress**
+- Crafting Route Solver
+
+**Planned**
+- Currency Costs in Farm Time
+- Step-by-Step Crafting Plans
 
 ## The crate graph
 
